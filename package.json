@@ -1,0 +1,19 @@
+{
+  "name": "gemini-rag-chromadb",
+  "version": "1.0.0",
+  "description": "RAG Chatbot ChromaDB Version (Pariwisata)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "ingest": "node ingest.js"
+  },
+  "dependencies": {
+    "@pinecone-database/pinecone": "latest",
+    "@xenova/transformers": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "groq-sdk": "latest"
+  }
+}
