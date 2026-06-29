@@ -50,25 +50,74 @@ app.post('/api/chat', async (req, res) => {
       return res.status(503).json({ error: "Model AI masih loading, coba lagi dalam beberapa detik..." });
     }
 
-    // 1. Embed Query dengan Xenova (selalu pakai pesan terbaru untuk retrieval)
-    const output = await extractor(userMessage, {
-      pooling: 'mean',
-      normalize: true,
-    });
-    const userVector = Array.from(output.data);
+    // 1. Generate Query Variations (Multi-Query)
+    const variationPrompt = `You are an AI language model assistant. Your task is to generate 3 different versions of the given user question to retrieve relevant documents from a vector database. 
+CRITICAL RULE: You MUST translate and generate all these alternative questions in ENGLISH, regardless of the language the user used. The embedding model is optimized for English, so translating foreign queries to English will ensure accurate search results.
+Provide these alternative questions separated by newlines. Do not include any introductory text, numbers, or bullet points. Just output the questions in English.`;
 
-    // 2. Similarity Search menggunakan Pinecone
-    const results = await index.query({
-      topK: 3,
-      vector: userVector,
-      includeMetadata: true
-    });
+    let queries = [userMessage];
+    try {
+      const variationCompletion = await groq.chat.completions.create({
+        messages: [
+          { role: 'system', content: variationPrompt },
+          { role: 'user', content: userMessage }
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.2, // Temperature rendah agar lebih fokus
+      });
+      const generatedText = variationCompletion.choices[0]?.message?.content || "";
+      // Memecah berdasarkan newline, menghapus spasi ekstra, dan membuang baris kosong
+      const generatedQueries = generatedText.split('\n').map(q => q.trim()).filter(q => q.length > 0);
+      queries = queries.concat(generatedQueries);
+    } catch (e) {
+      console.error("Gagal menghasilkan variasi query, menggunakan query asli:", e);
+    }
 
-    console.log("Skor kecocokan Pinecone:", results.matches.map(m => m.score));
+    // Deduplikasi queries (berjaga-jaga jika ada yang kembar)
+    queries = [...new Set(queries)];
+    console.log("Queries untuk Pinecone:", queries);
 
-    const relevantDocs = results.matches
-      .filter(match => match.metadata && match.metadata.text)
-      .map(match => match.metadata.text);
+    // 2. Embed & Search untuk semua queries secara paralel
+    let allMatches = [];
+    await Promise.all(queries.map(async (query) => {
+      try {
+        const output = await extractor(query, {
+          pooling: 'mean',
+          normalize: true,
+        });
+        const vector = Array.from(output.data);
+        
+        const results = await index.query({
+          topK: 3,
+          vector: vector,
+          includeMetadata: true
+        });
+        
+        allMatches.push(...results.matches);
+      } catch (e) {
+        console.error(`Gagal embedding/search untuk query: "${query}"`, e);
+      }
+    }));
+
+    // 3. Deduplikasi Hasil Dokumen (Berdasarkan text)
+    const uniqueDocsMap = new Map();
+    for (const match of allMatches) {
+      if (match.metadata && match.metadata.text) {
+        const docText = match.metadata.text;
+        // Jika belum ada, atau jika ada namun score yang baru lebih tinggi (opsional)
+        if (!uniqueDocsMap.has(docText) || uniqueDocsMap.get(docText).score < match.score) {
+          uniqueDocsMap.set(docText, match);
+        }
+      }
+    }
+    
+    // Sort berdasarkan score tertinggi (agar konteks terpenting di urutan atas)
+    const uniqueDocs = Array.from(uniqueDocsMap.values()).sort((a, b) => b.score - a.score);
+
+    console.log(`Jumlah dokumen sebelum deduplikasi: ${allMatches.length}`);
+    console.log(`Jumlah dokumen unik setelah deduplikasi: ${uniqueDocs.length}`);
+
+    const relevantDocs = uniqueDocs.map(match => match.metadata.text);
 
     const contextText = relevantDocs.length > 0
       ? relevantDocs.map(doc => `- ${doc}`).join('\n')
@@ -106,7 +155,7 @@ STRICT RULES:
 
 5. NO HALLUCINATION:
    - ONLY use facts from the knowledge base below.
-   - PRICING & DISCOUNTS (CRITICAL): Never invent discounts. If not in the knowledge base, redirect warmly to contact the team using the markdown links above.
+   - PRICING & DISCOUNTS (CRITICAL): NEVER invent discounts. If the user asks a general question about discounts (without specifying an activity), you MUST state that discounts apply to certain activities only and redirect them warmly to contact WhatsApp for further details. Do NOT mention specific activity names (like Nusa Penida) for general discount inquiries. If no discount exists for a requested service, explicitly state there is none. Do NOT assume, calculate, or guess any price reductions.
 
 6. UNKNOWN / EMPTY CONTEXT:
    - If the answer is not in the knowledge base below, politely decline and provide the contact markdown links.
