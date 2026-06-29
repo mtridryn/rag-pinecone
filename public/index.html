@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ubud Activity Bali</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        'ubud-dark-green': '#064e3b',
+                        'ubud-light-green': '#10b981',
+                        'ubud-yellow': '#f59e0b',
+                        'ubud-cream': '#fef3c7'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .container-ubud { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+            .h1-ubud { @apply text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight; }
+            .h2-ubud { @apply text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight; }
+            .section-y { @apply py-12 sm:py-16 lg:py-24; }
+            .card-ubud { @apply bg-white rounded-2xl shadow-xl overflow-hidden; }
+        }
+        .img-cover { width: 100%; height: 100%; object-fit: cover; }
+        .aspect-square { aspect-ratio: 1 / 1; }
+        .service-image { width: 100%; height: 100%; object-fit: cover; }
+        
+        </style>
+    <style>
+        </style>
+    <style>
+        /* Chat Widget CSS */
+        .chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 999; font-family: 'Inter', sans-serif; }
+        .chat-toggle { width: 50px; height: 50px; background-color: #f59e0b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.2); cursor: pointer; border: none; font-size: 20px; transition: 0.3s; }
+        .chat-toggle:hover { transform: scale(1.05); }
+        .chat-window { display: none; position: absolute; bottom: 65px; right: 0; width: 320px; height: 420px; max-height: 70vh; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); flex-direction: column; }
+        .chat-header { background: #064e3b; color: white; padding: 12px 15px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center; border-top-left-radius: 16px; border-top-right-radius: 16px; }
+        .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .message { padding: 8px 12px; border-radius: 12px; max-width: 85%; font-size: 13px; line-height: 1.4; word-wrap: break-word; }
+        .message.bot { background-color: #e5e7eb; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .message.user { background-color: #064e3b; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-footer { padding: 10px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; background: white; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+        .chat-footer input { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 20px; outline: none; transition: 0.3s; font-size: 13px; }
+        .chat-footer input:focus { border-color: #064e3b; }
+        .chat-footer button { background-color: #f59e0b; color: #064e3b; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 13px; }
+    
+        .message ul { list-style-type: disc; margin-left: 20px; margin-top: 5px; margin-bottom: 5px; }
+        .message ol { list-style-type: decimal; margin-left: 20px; margin-top: 5px; margin-bottom: 5px; }
+        .message p { margin-bottom: 8px; }
+        .message p:last-child { margin-bottom: 0; }
+        .message a { color: #2563eb; text-decoration: underline; font-weight: 500; }
+        .message strong { font-weight: bold; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navbar -->
+    <nav class="bg-ubud-dark-green text-white fixed w-full z-50 top-0 shadow-lg">
+        <div class="container-ubud py-4 flex justify-between items-center">
+            <a href="/index.html" class="text-xl font-bold text-ubud-yellow">Ubud Activity</a>
+            <div class="space-x-6 hidden md:block">
+                <a href="/index.html" class="hover:text-ubud-yellow transition">Home</a>
+                <a href="/not-available.html" class="hover:text-ubud-yellow transition">Marketplace</a>
+                <a href="/documentation.html" class="hover:text-ubud-yellow transition">Documentation</a>
+                <a href="#about" class="hover:text-ubud-yellow transition">About Us</a>
+                <a href="/login.html" class="bg-ubud-yellow text-ubud-dark-green px-4 py-2 rounded-full font-bold hover:bg-yellow-400 transition">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="min-h-screen pt-16">
+        <!-- Hero Section -->
+        <section class="relative min-h-screen bg-gradient-to-b from-ubud-dark-green to-ubud-light-green">
+            <div class="absolute inset-0 bg-black opacity-40"></div>
+            <!-- Gunakan folder images untuk background hero jika nanti ada fotonya, sementara biarkan warna gradien saja -->
+            <div class="relative z-10 min-h-screen flex flex-col justify-center items-center text-center text-white container-ubud">
+                <div class="flex-1 flex flex-col justify-center items-center pt-20 pb-8">
+                    <h1 class="h1-ubud mb-4 sm:mb-6">Ubud Activity Bali</h1>
+                    <p class="text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 max-w-xl lg:max-w-2xl mx-auto leading-relaxed px-4">
+                        Ubud Activity Bali is a trusted activity service provider that company has been operating for more than 5 years. We offer adventure and cultural experiences in the beautiful Ubud area.
+                    </p>
+                    <a href="/not-available.html" class="bg-ubud-yellow text-ubud-dark-green px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base lg:text-lg hover:bg-yellow-400 transition-colors inline-block mb-8 sm:mb-12">
+                        Explore Now
+                    </a>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="pb-8 sm:pb-12 lg:pb-16 w-full">
+                    <div class="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-8 max-w-xs sm:max-w-md lg:max-w-2xl mx-auto px-4">
+                        <div class="text-center bg-ubud-yellow bg-opacity-90 px-2 sm:px-4 lg:px-6 py-3 sm:py-4 rounded-lg backdrop-blur-sm">
+                            <div class="text-lg sm:text-2xl lg:text-3xl font-bold text-ubud-dark-green">25000+</div>
+                            <div class="text-xs sm:text-sm text-ubud-dark-green font-medium">Book</div>
+                        </div>
+                        <div class="text-center bg-ubud-yellow bg-opacity-90 px-2 sm:px-4 lg:px-6 py-3 sm:py-4 rounded-lg backdrop-blur-sm">
+                            <div class="text-lg sm:text-2xl lg:text-3xl font-bold text-ubud-dark-green">100%</div>
+                            <div class="text-xs sm:text-sm text-ubud-dark-green font-medium">Safe</div>
+                        </div>
+                        <div class="text-center bg-ubud-yellow bg-opacity-90 px-2 sm:px-4 lg:px-6 py-3 sm:py-4 rounded-lg backdrop-blur-sm">
+                            <div class="text-lg sm:text-2xl lg:text-3xl font-bold text-ubud-dark-green">5+</div>
+                            <div class="text-xs sm:text-sm text-ubud-dark-green font-medium">Years Experience</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us Section -->
+        <section id="about" class="section-y bg-white">
+            <div class="container-ubud">
+                <div class="text-center mb-8 sm:mb-12">
+                    <h2 class="h2-ubud text-ubud-dark-green mb-4 sm:mb-6">About Us</h2>
+                    <div class="space-y-4 sm:space-y-6 text-gray-700 text-sm sm:text-base leading-relaxed max-w-4xl mx-auto">
+                        <p>
+                            Located in the scenic village of Br. Silakarang, Singapadu Kaler, Sukawati District, Gianyar Regency, Ubud Activity Bali has been creating memorable adventure experiences since 2020. We specialize in bringing you the best of Ubud's natural wonders through exciting activities like ATV rides, Swing adventures, Rafting, and Jeep - Trekking.
+                        </p>
+                        <p>
+                            What sets us apart is our strong partnerships with leading vendors and premier tourist destinations across Bali. These collaborations allow us to offer exceptional tour packages at prices more competitive than booking directly with individual vendors, ensuring you get the best value for your adventure.
+                        </p>
+                        <p>
+                            Whether you're traveling solo, with family, or in a group, we have carefully curated activity packages to suit every need and preference. For our business partners, we provide transparent contracts and exclusive pricing that delivers greater profitability and long-term value.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Placeholder Image Grid (Replace src with local images folder when available) -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto mt-8">
+                    <div class="card-ubud overflow-hidden"><img src="images/placeholder1.jpg" alt="About 1" class="img-cover aspect-square bg-gray-200" /></div>
+                    <div class="card-ubud overflow-hidden"><img src="images/placeholder2.jpg" alt="About 2" class="img-cover aspect-square bg-gray-200" /></div>
+                    <div class="card-ubud overflow-hidden"><img src="images/placeholder3.jpg" alt="About 3" class="img-cover aspect-square bg-gray-200" /></div>
+                    <div class="card-ubud overflow-hidden"><img src="images/placeholder4.jpg" alt="About 4" class="img-cover aspect-square bg-gray-200" /></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Services Section -->
+        <section class="section-y bg-ubud-light-green">
+            <div class="container-ubud">
+                <div class="text-center mb-8 sm:mb-12">
+                    <h2 class="h2-ubud text-white mb-3 sm:mb-4">Our Services</h2>
+                    <p class="text-white text-sm sm:text-base lg:text-lg">Discover amazing adventure experiences we offer in beautiful Ubud</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-5xl mx-auto">
+                    <!-- Services Placeholder Images -->
+                    <div class="card-ubud overflow-hidden relative">
+                        <div class="aspect-[4/3] bg-gray-200"><img src="images/service-jeep.jpg" alt="Trekking and Jeep" class="service-image" />
+                            <div class="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 bg-ubud-yellow px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full"><span class="text-ubud-dark-green font-bold text-xs sm:text-sm">Trekking and Jeep</span></div>
+                        </div>
+                    </div>
+                    <div class="card-ubud overflow-hidden relative">
+                        <div class="aspect-[4/3] bg-gray-200"><img src="images/service-swing.jpg" alt="Swing Nest" class="service-image" />
+                            <div class="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 bg-ubud-yellow px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full"><span class="text-ubud-dark-green font-bold text-xs sm:text-sm">Swing Nest</span></div>
+                        </div>
+                    </div>
+                    <div class="card-ubud overflow-hidden relative">
+                        <div class="aspect-[4/3] bg-gray-200"><img src="images/service-nusa.jpg" alt="Nusa Penida" class="service-image" />
+                            <div class="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 bg-ubud-yellow px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full"><span class="text-ubud-dark-green font-bold text-xs sm:text-sm">Nusa Penida</span></div>
+                        </div>
+                    </div>
+                    <div class="card-ubud overflow-hidden relative">
+                        <div class="aspect-[4/3] bg-gray-200"><img src="images/service-atv.jpg" alt="ATV Adventure" class="service-image" />
+                            <div class="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 bg-ubud-yellow px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full"><span class="text-ubud-dark-green font-bold text-xs sm:text-sm">ATV Adventure</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                Live Chat Ubud Activity
+                <span style="font-size:12px; cursor:pointer;" onclick="toggleChat()">Close</span>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="message bot">Hello! I am the Ubud Activity Bali virtual assistant. How can I help you with your holiday?</div>
+            </div>
+            <div class="chat-footer">
+                <input type="text" id="userInput" placeholder="Type your message..." onkeypress="handleEnter(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <button class="chat-toggle" onclick="toggleChat()">💬</button>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatBody = document.getElementById('chatBody');
+            chatBody.innerHTML += `<div class="message user">${text}</div>`;
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            const loadingId = 'loading-' + Date.now();
+            chatBody.innerHTML += `<div class="message bot" id="${loadingId}">...typing...</div>`;
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+                // Ensure this points to the same server rendering the static file
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, history: conversationHistory })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (data.error) {
+                    chatBody.innerHTML += `<div class="message bot" style="color:red;">Error: ${data.error}</div>`;
+                } else {
+                    conversationHistory.push({ role: 'user', content: text });
+                    conversationHistory.push({ role: 'assistant', content: data.answer });
+
+                    const parsedMarkdown = marked.parse(data.answer);
+                    chatBody.innerHTML += `<div class="message bot">${parsedMarkdown}</div>`;
+
+                    if (data.answer.includes("Mohon maaf") || data.answer.toLowerCase().includes("tidak tersedia") || data.answer.toLowerCase().includes("silakan hubungi")) {
+                        chatBody.innerHTML += `
+                          <div class="message bot" style="background-color: #dbeafe; border-left: 4px solid #2563eb;">
+                            <span style="font-size:12px; color:#4b5563;"> Automated Operation Stopped.</span><br>
+                            Need a specific answer? Please contact our CS.<br>
+                            <a href="https://wa.me/6285117148517" target="_blank" style="display:inline-block; margin-top:8px; padding:6px 12px; background-color:#25d366; color:white; text-decoration:none; border-radius:15px; font-weight:bold; font-size:12px;">📞 Contact WhatsApp CS</a>
+                          </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatBody.innerHTML += `<div class="message bot" style="color:red;">Connection to backend lost. Please ensure the server is running.</div>`;
+            }
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+</body>
+</html>

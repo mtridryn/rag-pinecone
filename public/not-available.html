@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Available - Ubud Activity Bali</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        'ubud-dark-green': '#064e3b',
+                        'ubud-light-green': '#10b981',
+                        'ubud-yellow': '#f59e0b',
+                        'ubud-cream': '#fef3c7'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .container-ubud { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+        }
+        
+        </style>
+    <style>
+        </style>
+    <style>
+        /* Chat Widget CSS */
+        .chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 999; font-family: 'Inter', sans-serif; }
+        .chat-toggle { width: 50px; height: 50px; background-color: #f59e0b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.2); cursor: pointer; border: none; font-size: 20px; transition: 0.3s; }
+        .chat-toggle:hover { transform: scale(1.05); }
+        .chat-window { display: none; position: absolute; bottom: 65px; right: 0; width: 320px; height: 420px; max-height: 70vh; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); flex-direction: column; }
+        .chat-header { background: #064e3b; color: white; padding: 12px 15px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center; border-top-left-radius: 16px; border-top-right-radius: 16px; }
+        .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .message { padding: 8px 12px; border-radius: 12px; max-width: 85%; font-size: 13px; line-height: 1.4; word-wrap: break-word; }
+        .message.bot { background-color: #e5e7eb; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .message.user { background-color: #064e3b; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-footer { padding: 10px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; background: white; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+        .chat-footer input { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 20px; outline: none; transition: 0.3s; font-size: 13px; }
+        .chat-footer input:focus { border-color: #064e3b; }
+        .chat-footer button { background-color: #f59e0b; color: #064e3b; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 13px; }
+    
+        .message ul { list-style-type: disc; margin-left: 20px; margin-top: 5px; margin-bottom: 5px; }
+        .message ol { list-style-type: decimal; margin-left: 20px; margin-top: 5px; margin-bottom: 5px; }
+        .message p { margin-bottom: 8px; }
+        .message p:last-child { margin-bottom: 0; }
+        .message a { color: #2563eb; text-decoration: underline; font-weight: 500; }
+        .message strong { font-weight: bold; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-ubud-dark-green text-white fixed w-full z-50 top-0 shadow-lg">
+        <div class="container-ubud py-4 flex justify-between items-center">
+            <a href="/index.html" class="text-xl font-bold text-ubud-yellow">Ubud Activity</a>
+            <div class="space-x-6 hidden md:block">
+                <a href="/index.html" class="hover:text-ubud-yellow transition">Home</a>
+                <a href="/not-available.html" class="hover:text-ubud-yellow transition">Marketplace</a>
+                <a href="/documentation.html" class="hover:text-ubud-yellow transition">Documentation</a>
+                <a href="/index.html#about" class="hover:text-ubud-yellow transition">About Us</a>
+                <a href="/login.html" class="bg-ubud-yellow text-ubud-dark-green px-4 py-2 rounded-full font-bold hover:bg-yellow-400 transition">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Not Available Content -->
+    <main class="flex-grow flex items-center justify-center p-4 mt-16">
+        <div class="text-center max-w-lg">
+            <div class="text-ubud-yellow text-6xl mb-6">⚠️</div>
+            <h1 class="text-3xl font-bold text-ubud-dark-green mb-4">THIS PAGE IS NOT AVAILABLE</h1>
+            <p class="text-gray-600 mb-8">
+                Halaman ini belum tersedia pada prototipe saat ini. 
+                Sistem saat ini difokuskan pada pengujian dan komparasi model Chatbot AI.
+            </p>
+            <a href="/index.html" class="inline-block bg-ubud-dark-green text-white px-8 py-3 rounded-full font-semibold hover:bg-ubud-light-green transition-colors">
+                Kembali ke Beranda
+            </a>
+        </div>
+    </main>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                Live Chat Ubud Activity
+                <span style="font-size:12px; cursor:pointer;" onclick="toggleChat()">Close</span>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="message bot">Hello! I am the Ubud Activity Bali virtual assistant. How can I help you with your holiday?</div>
+            </div>
+            <div class="chat-footer">
+                <input type="text" id="userInput" placeholder="Type your message..." onkeypress="handleEnter(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <button class="chat-toggle" onclick="toggleChat()">💬</button>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+            const chatBody = document.getElementById('chatBody');
+            chatBody.innerHTML += `<div class="message user">${text}</div>`;
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+            const loadingId = 'loading-' + Date.now();
+            chatBody.innerHTML += `<div class="message bot" id="${loadingId}">...typing...</div>`;
+            chatBody.scrollTop = chatBody.scrollHeight;
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, history: conversationHistory })
+                });
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+                if (data.error) {
+                    chatBody.innerHTML += `<div class="message bot" style="color:red;">Error: ${data.error}</div>`;
+                } else {
+                    conversationHistory.push({ role: 'user', content: text });
+                    conversationHistory.push({ role: 'assistant', content: data.answer });
+                    const parsedMarkdown = marked.parse(data.answer);
+                    chatBody.innerHTML += `<div class="message bot">${parsedMarkdown}</div>`;
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatBody.innerHTML += `<div class="message bot" style="color:red;">Connection to backend lost. Please ensure the server is running.</div>`;
+            }
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+</body>
+</html>
