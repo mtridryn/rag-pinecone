@@ -50,25 +50,70 @@ app.post('/api/chat', async (req, res) => {
       return res.status(503).json({ error: "Model AI masih loading, coba lagi dalam beberapa detik..." });
     }
 
-    // 1. Embed Query dengan Xenova (selalu pakai pesan terbaru untuk retrieval)
-    const output = await extractor(userMessage, {
-      pooling: 'mean',
-      normalize: true,
+    // 1. Query Decomposition menggunakan Groq
+    const decompositionPrompt = `You are an expert search query decomposer. Your task is to break down the user's question into one or more simple, specific sub-questions.
+CRITICAL RULES:
+1. ALL sub-questions MUST be generated in ENGLISH, regardless of the user's original language. This is strictly required for optimal vector search.
+2. If the user's question is already simple (e.g., "Hello", "How much?"), just translate it to English as a single sub-question.
+3. Return ONLY a valid JSON object with the key "queries" containing an array of strings. Do not include any other text.
+Example 1: "Berapa harga rafting dan apakah ada jemputan?" -> {"queries": ["What is the price for rafting?", "Is there a pickup service available?"]}
+Example 2: "Halo" -> {"queries": ["Hello"]}
+`;
+    
+    let decomposedQueries = [userMessage]; // Fallback jika gagal
+    try {
+      console.log("Mendekomposisi pertanyaan:", userMessage);
+      const decompCompletion = await groq.chat.completions.create({
+        messages: [
+          { role: 'system', content: decompositionPrompt },
+          { role: 'user', content: userMessage }
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.1, // Rendah agar lebih deterministik dan fokus
+        response_format: { type: "json_object" }
+      });
+      
+      const parsed = JSON.parse(decompCompletion.choices[0]?.message?.content || '{"queries":[]}');
+      if (parsed.queries && Array.isArray(parsed.queries) && parsed.queries.length > 0) {
+        decomposedQueries = parsed.queries;
+      }
+    } catch (e) {
+      console.error("Gagal melakukan dekomposisi query, menggunakan fallback pertanyaan asli.", e);
+    }
+
+    console.log("Decomposed Queries (English):", decomposedQueries);
+
+    // 2. Parallel Embedding & Search untuk setiap sub-question
+    const searchPromises = decomposedQueries.map(async (query) => {
+      const output = await extractor(query, {
+        pooling: 'mean',
+        normalize: true,
+      });
+      const userVector = Array.from(output.data);
+
+      const results = await index.query({
+        topK: 3,
+        vector: userVector,
+        includeMetadata: true
+      });
+      return results.matches;
     });
-    const userVector = Array.from(output.data);
 
-    // 2. Similarity Search menggunakan Pinecone
-    const results = await index.query({
-      topK: 3,
-      vector: userVector,
-      includeMetadata: true
+    const allResults = await Promise.all(searchPromises);
+    const flatMatches = allResults.flat();
+
+    // 3. Deduplikasi Dokumen Konteks
+    const uniqueDocsMap = new Map();
+    flatMatches.forEach(match => {
+      if (match.metadata && match.metadata.text) {
+        if (!uniqueDocsMap.has(match.metadata.text)) {
+          uniqueDocsMap.set(match.metadata.text, match);
+        }
+      }
     });
 
-    console.log("Skor kecocokan Pinecone:", results.matches.map(m => m.score));
-
-    const relevantDocs = results.matches
-      .filter(match => match.metadata && match.metadata.text)
-      .map(match => match.metadata.text);
+    const relevantDocs = Array.from(uniqueDocsMap.values()).map(match => match.metadata.text);
+    console.log(`Ditemukan ${relevantDocs.length} dokumen unik dari Pinecone dari total ${flatMatches.length} dokumen mentah.`);
 
     const contextText = relevantDocs.length > 0
       ? relevantDocs.map(doc => `- ${doc}`).join('\n')
@@ -96,7 +141,9 @@ STRICT RULES:
    - NEVER cross-apply prices, durations, inclusions, or details from one service onto another — even if they sound similar.
 
 3. ANSWER QUALITY & FORMATTING:
-   - Use bullet points and bold text for prices and key features. Keep paragraphs short.
+   - Use bullet points and bold text for prices, key features, and when answering MULTIPLE QUESTIONS in a single response. This makes it easy for the user to read.
+   - If the user asks about multiple topics or activities at once, structure your response neatly (e.g., using a separate bullet point or small paragraph for each topic).
+   - Keep paragraphs short.
    - When providing contact details, ALWAYS format them as clickable markdown links like this: [WhatsApp +6285117148517](https://wa.me/6285117148517) or [Instagram @ubudactivitybali](https://instagram.com/ubudactivitybali).
    - Answer the specific question directly — no unnecessary padding or rephrasing the question back.
 

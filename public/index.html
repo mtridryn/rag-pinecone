@@ -238,15 +238,6 @@
                     const parsedMarkdown = marked.parse(data.answer);
                     chatBody.innerHTML += `<div class="message bot">${parsedMarkdown}</div>`;
 
-                    if (data.answer.includes("Mohon maaf") || data.answer.toLowerCase().includes("tidak tersedia") || data.answer.toLowerCase().includes("silakan hubungi")) {
-                        chatBody.innerHTML += `
-                          <div class="message bot" style="background-color: #dbeafe; border-left: 4px solid #2563eb;">
-                            <span style="font-size:12px; color:#4b5563;"> Automated Operation Stopped.</span><br>
-                            Need a specific answer? Please contact our CS.<br>
-                            <a href="https://wa.me/6285117148517" target="_blank" style="display:inline-block; margin-top:8px; padding:6px 12px; background-color:#25d366; color:white; text-decoration:none; border-radius:15px; font-weight:bold; font-size:12px;">📞 Contact WhatsApp CS</a>
-                          </div>
-                        `;
-                    }
                 }
             } catch (error) {
                 document.getElementById(loadingId).remove();
