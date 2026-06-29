@@ -50,14 +50,32 @@ app.post('/api/chat', async (req, res) => {
       return res.status(503).json({ error: "Model AI masih loading, coba lagi dalam beberapa detik..." });
     }
 
-    // 1. Embed Query dengan Xenova (selalu pakai pesan terbaru untuk retrieval)
-    const output = await extractor(userMessage, {
+    // 1. Generate Hypothetical Document (HyDE) menggunakan Groq
+    const hydeInstruction = `You are an expert on adventure tourism and travel activities in Bali. Please write a brief, factual hypothetical response to the user's question. Even if you don't know the exact details, provide a plausible answer that contains relevant keywords, concepts, and typical information related to Bali adventure tourism. Do not include introductory phrases.`;
+    
+    const hydeCompletion = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: hydeInstruction },
+        { role: 'user', content: userMessage }
+      ],
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.6, 
+    });
+    
+    const hypotheticalDocument = hydeCompletion.choices[0]?.message?.content || userMessage;
+    console.log("\n--- [HyDE] ---");
+    console.log("User Message:", userMessage);
+    console.log("Hypothetical Document:", hypotheticalDocument);
+    console.log("--------------\n");
+
+    // 2. Embed Hypothetical Document dengan Xenova
+    const output = await extractor(hypotheticalDocument, {
       pooling: 'mean',
       normalize: true,
     });
     const userVector = Array.from(output.data);
 
-    // 2. Similarity Search menggunakan Pinecone
+    // 3. Similarity Search menggunakan Pinecone
     const results = await index.query({
       topK: 3,
       vector: userVector,
@@ -74,7 +92,7 @@ app.post('/api/chat', async (req, res) => {
       ? relevantDocs.map(doc => `- ${doc}`).join('\n')
       : '';
 
-    // 3. Generation menggunakan Groq (dengan conversation history)
+    // 4. Generation menggunakan Groq (dengan conversation history)
     const isContextEmpty = contextText === '';
     const systemInstruction = `You are a professional Customer Service Assistant for Ubud Activity Bali, a travel agency specializing in adventure tourism based in Ubud, Bali.
 
