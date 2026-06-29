@@ -179,6 +179,9 @@
     </div>
 
     <script>
+        // Riwayat percakapan — reset saat halaman di-refresh
+        let conversationHistory = [];
+
         // Fungsi buka/tutup jendela chat
         function toggleChat() {
             const chatWindow = document.getElementById('chatWindow');
@@ -198,10 +201,10 @@
 
             const chatBody = document.getElementById('chatBody');
 
-            // 1. Menampilkan pesan User 
+            // 1. Menampilkan pesan User
             chatBody.innerHTML += `<div class="message user">${text}</div>`;
-            input.value = ''; // Kosongkan input
-            chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bawah
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
 
             // 2. Efek loading
             const loadingId = 'loading-' + Date.now();
@@ -209,26 +212,29 @@
             chatBody.scrollTop = chatBody.scrollHeight;
 
             try {
-                // 3.Kirim data via Fetch ke API Chatbot (server.js)
+                // 3. Kirim pesan + history ke server
                 const response = await fetch('http://localhost:3001/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text }) // Format JSON
+                    body: JSON.stringify({ message: text, history: conversationHistory })
                 });
 
                 const data = await response.json();
 
-                // 4. Hapus tulisan loading dan ganti dengan balasan API
+                // 4. Hapus loading dan tampilkan balasan
                 document.getElementById(loadingId).remove();
 
                 if (data.error) {
                     chatBody.innerHTML += `<div class="message bot" style="color:red;">Error: ${data.error}</div>`;
                 } else {
-                    // Tampilkan balasan asli dari RAG (diubah dari Markdown ke HTML)
+                    // Simpan exchange ke history setelah berhasil
+                    conversationHistory.push({ role: 'user', content: text });
+                    conversationHistory.push({ role: 'assistant', content: data.answer });
+
                     const parsedMarkdown = marked.parse(data.answer);
                     chatBody.innerHTML += `<div class="message bot">${parsedMarkdown}</div>`;
 
-                    // DETEKSI LOGIKA: Jika bot tidak bisa menjawab, munculkan tombol Live Chat Manusia (WhatsApp)
+                    // Jika bot tidak bisa menjawab, munculkan tombol WhatsApp
                     if (data.answer.includes("Mohon maaf")) {
                         chatBody.innerHTML += `
               <div class="message bot" style="background-color: #dbeafe; border-left: 4px solid #2563eb;">
@@ -241,7 +247,7 @@
                 }
             } catch (error) {
                 document.getElementById(loadingId).remove();
-                chatBody.innerHTML += `<div class="message bot" style="color:red;">Koneksi ke backend terputus. Pastikan Terminal "npm start" menyala.</div>`; //sugget mamang AI
+                chatBody.innerHTML += `<div class="message bot" style="color:red;">Koneksi ke backend terputus. Pastikan Terminal "npm start" menyala.</div>`;
             }
             chatBody.scrollTop = chatBody.scrollHeight;
         }
